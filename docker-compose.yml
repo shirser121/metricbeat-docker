@@ -1,0 +1,21 @@
+version: '3.7'
+
+services:
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:8.10.4
+    container_name: metricbeat
+    user: root
+    volumes:
+      - ./metricbeat.docker.yml:/usr/share/metricbeat/metricbeat.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      - /proc:/hostfs/proc:ro
+      - /:/hostfs:ro
+    command: metricbeat -e -E output.elasticsearch.hosts=["${METRICBEAT_HOST}:9200"]
+    environment:
+      - MONITORING_INTERNAL_PASSWORD
+      - BEATS_SYSTEM_PASSWORD
+      - METRICBEAT_INTERNAL_PASSWORD
+      - METRICBEAT_NAME
+      - METRICBEAT_HOST
+    restart: always
