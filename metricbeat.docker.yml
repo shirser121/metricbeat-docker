@@ -1,0 +1,36 @@
+name: ${METRICBEAT_NAME}
+
+metricbeat.config:
+  modules:
+    path: ${path.config}/modules.d/*.yml
+    reload.enabled: false
+
+metricbeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+
+metricbeat.modules:
+  - module: system
+    period: 10s
+    metricsets:
+      - load
+    hostfs: /hostfs
+
+processors:
+  - add_cloud_metadata: ~
+
+monitoring:
+  enabled: true
+  elasticsearch:
+    username: beats_system
+    password: ${BEATS_SYSTEM_PASSWORD}
+
+output.elasticsearch:
+  hosts: [ "http://${METRICBEAT_HOST}:9200" ]
+  username: metricbeat_internal
+  password: ${METRICBEAT_INTERNAL_PASSWORD}
+
+http:
+  enabled: true
+  host: 0.0.0.0
